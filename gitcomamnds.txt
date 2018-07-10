@@ -1,0 +1,8 @@
+(install node.js first)
+
+npm install
+optional>>
+npm i npm@latest -g
+npm -g install gulp
+gulp
+
