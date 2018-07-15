@@ -1,50 +1,69 @@
+//my beloved console log shortcut <3
 var cl = console.log;
 cl('online');
+
+/*init stored users from localstorage if set,
+empty array if not*/
 var storedUsers = localStorage.getItem("storedUsers") != null ? JSON.parse(localStorage.getItem("storedUsers")) : [];
 
-//bonus bit
+/*
+bonus bit:
+replace a random contact div every 20 seconds
+*/
 function someCl(html) {
     //cl(storedUsers[0])
     $.ajax({
         url: 'https://randomuser.me/api/',
         dataType: 'json',
     }).then((user) => {
-        cl('durr', user.results[0].name.first)
+        cl('durr', user.results[0].name.first);
         var userDOMList = $('.userContainer');
         var userDOMListRandomElement = userDOMList[Math.floor(Math.random() * userDOMList.length)];
         cl(userDOMListRandomElement.id);
         $(userDOMListRandomElement).replaceWith(buildUser(user.results[0], html));
         setTimeout(() => {
             someCl(html)
-        }, 5000);
+        }, 20000);
     });
-
 }
 //bonus bit end
 
-//get 10 users on each refresh and add to storedUsers array
+//get 10 users on each page load and add to storedUsers array
 $.ajax({
         url: 'https://randomuser.me/api/?results=10',
         dataType: 'json',
     })
     .then((user) => {
         user.results.forEach(element => {
-            storedUsers.push(element);
-        })
+                storedUsers.push(element);
+            })
+            //push new users to localstorage and return storedUsers up the scope
         localStorage.setItem("storedUsers", JSON.stringify(storedUsers));
         return storedUsers;
 
     }).then(() => {
+        //grab user.html for use in builds
         $.get("user.html", (html) => {
+            //build a contact div for each storedUsers
             storedUsers.forEach(element => {
                 userDiv = buildUser(element, html);
                 if ($('#nousersMsg').length) $('#nousersMsg').remove();
                 userDiv.appendTo($('#userList'));
-            })
+            });
+            //assign click function to userspawner button
+            //make a contact div on each click
+            $('#userspawner').click(function(e) {
+                e.preventDefault();
+                $.get('https://randomuser.me/api/', (user) => {
+                    buildUser(user.results[0], html).appendTo($('#userList'));
+                });
+            });
+            //call recursive function see its description above
             someCl(html);
         }).then(() => {
             //now that dom is populated we can set our button fucntions
             //delete contact
+            cl('durr!!');
             $('.btn-danger').click((e) => {
                 $(e.target).closest('.userContainer').remove();
             });
@@ -57,18 +76,19 @@ $.ajax({
                 spanList = container.find('span');
                 //convert all span to input
                 spanList.each(function(index, element) {
+                    //store span content
                     var content = $(element).text();
                     var input = $('<input>', {
-                            value: content,
-                            class: "editInput"
-                        })
-                        //cl($(element));
+                        value: content,
+                        class: "editInput"
+                    });
+                    //replace span with input for edit
                     $(element).replaceWith(input);
                 });
                 //make save button
                 //find btn group of edit button and append a save button
                 var btnGroup = $(e.target).closest('.btn-group');
-                $(btnGroup).find('button.btn-success').length !== 0 ? cl('it does') : btnGroup.append(
+                btnGroup.append(
                     $('<button>', {
                         text: "save",
                         class: "btn btn-success",
@@ -86,39 +106,25 @@ $.ajax({
                             e.target.remove();
                         }
                     })
-                )
+                );
             });
         });
     });
-
-$('#userspawner').click(function(e) {
-    e.preventDefault();
-    makeUser(1);
-});
-
-
-function makeUser(user) {
-    $.get("user.html", (html) => {
-        $.get('https://randomuser.me/api/', (user) => {
-            buildUser(user.results[0], html);
-        });
-    });
-}
 
 //capitalize first letter of a string
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
 }
 
+//build user div from user.html
 function buildUser(user, html) {
-    var userInstance = user;
     var htmlReplaceValuesObj = {
-        userID: userInstance.login.uuid,
-        userImage: userInstance.picture.large,
-        userGender: userInstance.gender,
-        userName: userInstance.name.title.capitalize() + " " + userInstance.name.last.capitalize() + "," + userInstance.name.first.capitalize(),
-        userAge: userInstance.dob.age,
-        userEmail: userInstance.email,
+        userID: user.login.uuid,
+        userImage: user.picture.large,
+        userGender: user.gender,
+        userName: user.name.title.capitalize() + " " + user.name.last.capitalize() + "," + user.name.first.capitalize(),
+        userAge: user.dob.age,
+        userEmail: user.email,
     }
     var outputHtml = html;
     $.each(htmlReplaceValuesObj, (key, value) => {
