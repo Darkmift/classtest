@@ -54,6 +54,7 @@ body {
 }
 
 .userContainer {
+    position: relative;
     border-radius: 3px;
     background-color: lightgoldenrodyellow;
     width: 250px;
@@ -81,8 +82,9 @@ body {
 }
 
 .userContainer .btn-group {
-    margin: 10px;
-    float: left;
+    position: absolute;
+    left: 5px;
+    bottom: 10px;
 }
 
 .userContainer .btn-group button {
