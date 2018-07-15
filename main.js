@@ -7,6 +7,7 @@ $('#userspawner').click(function(e) {
 });
 
 function makeUser(int) {
+
     $.get("user.html", (html) => {
         $.get('https://randomuser.me/api/?results=' + int, (user) => {
             var userInstance = user.results[0];
@@ -27,6 +28,8 @@ function makeUser(int) {
                 cl('clicked del!')
                 $('#' + userInstance.login.uuid).remove()
             });
+            //remove empty notice
+            if ($('#nousersMsg').length) $('#nousersMsg').remove();
             //grab buttons from this instance user.html for assignemnt usage
             $(outputHtml).appendTo($('#userList'));
             //build btn functionality
