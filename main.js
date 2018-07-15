@@ -2,6 +2,26 @@ var cl = console.log;
 cl('online');
 var storedUsers = localStorage.getItem("storedUsers") != null ? JSON.parse(localStorage.getItem("storedUsers")) : [];
 
+//bonus bit
+function someCl(html) {
+    //cl(storedUsers[0])
+    $.ajax({
+        url: 'https://randomuser.me/api/',
+        dataType: 'json',
+    }).then((user) => {
+        cl('durr', user.results[0].name.first)
+        var userDOMList = $('.userContainer');
+        var userDOMListRandomElement = userDOMList[Math.floor(Math.random() * userDOMList.length)];
+        cl(userDOMListRandomElement.id);
+        $(userDOMListRandomElement).replaceWith(buildUser(user.results[0], html));
+        setTimeout(() => {
+            someCl(html)
+        }, 5000);
+    });
+
+}
+//bonus bit end
+
 //get 10 users on each refresh and add to storedUsers array
 $.ajax({
         url: 'https://randomuser.me/api/?results=10',
@@ -10,23 +30,72 @@ $.ajax({
     .then((user) => {
         user.results.forEach(element => {
             storedUsers.push(element);
-            localStorage.setItem("storedUsers", JSON.stringify(storedUsers));
-            return storedUsers;
         })
+        localStorage.setItem("storedUsers", JSON.stringify(storedUsers));
+        return storedUsers;
 
     }).then(() => {
         $.get("user.html", (html) => {
             storedUsers.forEach(element => {
-                buildUser(element, html)
+                userDiv = buildUser(element, html);
+                if ($('#nousersMsg').length) $('#nousersMsg').remove();
+                userDiv.appendTo($('#userList'));
             })
-        });
+            someCl(html);
+        }).then(() => {
+            //now that dom is populated we can set our button fucntions
+            //delete contact
+            $('.btn-danger').click((e) => {
+                $(e.target).closest('.userContainer').remove();
+            });
 
+            //edit contact
+            $('.btn-edit').click((e) => {
+                //grab the contact parent of this clicked button 
+                var container = $(e.target).closest('.userContainer');
+                //define the spans with info to edit
+                spanList = container.find('span');
+                //convert all span to input
+                spanList.each(function(index, element) {
+                    var content = $(element).text();
+                    var input = $('<input>', {
+                            value: content,
+                            class: "editInput"
+                        })
+                        //cl($(element));
+                    $(element).replaceWith(input);
+                });
+                //make save button
+                //find btn group of edit button and append a save button
+                var btnGroup = $(e.target).closest('.btn-group');
+                $(btnGroup).find('button.btn-success').length !== 0 ? cl('it does') : btnGroup.append(
+                    $('<button>', {
+                        text: "save",
+                        class: "btn btn-success",
+                        click: (e) => {
+                            //cl('clickedsuccess!');
+                            spanList = container.find('input');
+                            spanList.each(function(index, element) {
+                                //cl(element, index);
+                                var content = $(element).val();
+                                var spanEdited = $('<span>', {
+                                    text: content,
+                                })
+                                $(element).replaceWith(spanEdited);
+                            });
+                            e.target.remove();
+                        }
+                    })
+                )
+            });
+        });
     });
 
 $('#userspawner').click(function(e) {
     e.preventDefault();
     makeUser(1);
 });
+
 
 function makeUser(user) {
     $.get("user.html", (html) => {
@@ -56,63 +125,6 @@ function buildUser(user, html) {
         var regEx = new RegExp('{{' + key + '}}', 'gi');
         outputHtml = outputHtml.replace(regEx, value);
     });
-    $(outputHtml + '> .btn btn-danger').click(() => {
-        cl('clicked del!')
-        $('#' + userInstance.login.uuid).remove()
-    });
 
-    //remove empty notice
-    if ($('#nousersMsg').length) $('#nousersMsg').remove();
-
-    //grab buttons from this instance user.html for assignemnt usage
-    $(outputHtml).appendTo($('#userList'));
-
-    //build btn functionality
-    // cl($(outputHtml).find('.btn-danger'));
-
-    //delete contact
-    $('.btn-danger').click((e) => {
-        $(e.target).closest('.userContainer').remove();
-    });
-
-    //edit contact
-    $('.btn-edit').click((e) => {
-        //grab the contact parent of this clicked button 
-        var container = $(e.target).closest('.userContainer');
-        //define the spans with info to edit
-        spanList = container.find('span');
-        //convert all span to input
-        spanList.each(function(index, element) {
-            var content = $(element).text();
-            var input = $('<input>', {
-                value: content,
-                class: "editInput"
-            })
-            cl($(element));
-            $(element).replaceWith(input);
-        });
-        //make save button
-        //find btn group of edit button and append a save button
-        var btnGroup = $(e.target).closest('.btn-group');
-        $(btnGroup).find('button.btn-success').length !== 0 ? cl('it does') : btnGroup.append(
-            $('<button>', {
-                text: "save",
-                class: "btn btn-success",
-                click: (e) => {
-                    cl('clickedsuccess!');
-                    spanList = container.find('input');
-                    spanList.each(function(index, element) {
-                        cl(element, index);
-                        var content = $(element).val();
-                        var spanEdited = $('<span>', {
-                            text: content,
-                        })
-                        $(element).replaceWith(spanEdited);
-                    });
-                    e.target.remove();
-                }
-            })
-        )
-    });
-    //ask why its cl more than once...meanwhile ternary checking if hasclass then do not add anymore
+    return $(outputHtml);
 }
