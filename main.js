@@ -20,10 +20,13 @@ function someCl(html) {
         var userDOMList = $('.userContainer');
         var userDOMListRandomElement = userDOMList[Math.floor(Math.random() * userDOMList.length)];
         cl(userDOMListRandomElement.id);
-        $(userDOMListRandomElement).replaceWith(buildUser(user.results[0], html));
+        $(userDOMListRandomElement).fadeOut('slow').promise().done(() => {
+            $(userDOMListRandomElement).replaceWith(buildUser(user.results[0], html));
+            $(userDOMListRandomElement).fadeIn('slow');
+        });
         setTimeout(() => {
             someCl(html)
-        }, 20000);
+        }, 8000);
     });
 }
 //bonus bit end
@@ -48,14 +51,15 @@ $.ajax({
             storedUsers.forEach(element => {
                 userDiv = buildUser(element, html);
                 if ($('#nousersMsg').length) $('#nousersMsg').remove();
-                userDiv.appendTo($('#userList'));
+                // userDiv.appendTo($('#userList'));
+                $('#userList').append(userDiv.hide().fadeIn(1500))
             });
             //assign click function to userspawner button
             //make a contact div on each click
             $('#userspawner').click(function(e) {
                 e.preventDefault();
                 $.get('https://randomuser.me/api/', (user) => {
-                    buildUser(user.results[0], html).appendTo($('#userList'));
+                    $('#userList').append(buildUser(user.results[0], html).hide().fadeIn(1500))
                 });
             });
             //call recursive function see its description above
@@ -63,9 +67,16 @@ $.ajax({
         }).then(() => {
             //now that dom is populated we can set our button fucntions
             //delete contact
-            cl('durr!!');
             $('.btn-danger').click((e) => {
-                $(e.target).closest('.userContainer').remove();
+                // $(e.target).closest('.userContainer').fadeOut(3000, function() {
+                //     $(this).remove();
+                // });
+                $(e.target).closest('.userContainer').animate({
+                    opacity: 0, // animate slideUp
+                    marginLeft: '-250px'
+                }, 750, 'linear', function() {
+                    $(this).remove();
+                });
             });
 
             //edit contact

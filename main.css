@@ -1,13 +1,16 @@
-::-webkit-scrollbar { 
-    display: none; 
+::-webkit-scrollbar {
+    display: none;
 }
 
-html, body {
+html,
+body {
     height: 100%;
 }
+
 body {
     margin: 0;
 }
+
 .flex-container {
     height: 100%;
     padding: 0;
@@ -20,10 +23,15 @@ body {
     align-items: center;
     justify-content: center;
 }
+
 .row {
     width: auto;
-    border: 1px solid blue;
+    border: 1px solid rgb(158, 152, 152);
+    -webkit-box-shadow: 6px 6px 5px 0px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: 6px 6px 5px 0px rgba(0, 0, 0, 0.75);
+    box-shadow: 6px 6px 5px 0px rgba(0, 0, 0, 0.75);
 }
+
 .flex-item {
     padding: 5px;
     /* width: 20px;
@@ -35,47 +43,52 @@ body {
     text-align: center;
 }
 
-#userList{
+#userList {
     display: flex;
-    width:70vw;
-    height:80vh;
-    background-color: bisque;
+    width: 70vw;
+    height: 80vh;
+    border: 1px solid rgb(158, 152, 152);
     flex-direction: row;
-    flex-wrap: wrap; 
-    overflow:scroll;
+    flex-wrap: wrap;
+    overflow: scroll;
 }
 
-.userContainer{
-    border:1px solid lightgray;
+.userContainer {
     border-radius: 3px;
     background-color: lightgoldenrodyellow;
-    width:250px;
-    height:475px;
-    margin-top:5px;
-    margin-bottom:15px;
-    margin-left:15px;
-    word-wrap: break-word
+    width: 250px;
+    height: 475px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    margin-left: 15px;
+    word-wrap: break-word;
+    border: 1px solid rgb(158, 152, 152);
+    -webkit-box-shadow: 6px 6px 5px 0px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: 6px 6px 5px 0px rgba(0, 0, 0, 0.75);
+    box-shadow: 6px 6px 5px 0px rgba(0, 0, 0, 0.75);
 }
 
-.userContainer img{
-    margin-top:5px;
-    width:200px;
-    height:200px;
+.userContainer img {
+    margin-top: 5px;
+    width: 200px;
+    height: 200px;
 }
 
-.userContainer p{
-    font-size:20px;
-    margin:10px 5px;
+.userContainer p {
+    font-size: 20px;
+    margin: 10px 5px;
     text-align: left;
 }
 
-.userContainer .btn-group{
-    margin:10px;
-    float:left;
+.userContainer .btn-group {
+    margin: 10px;
+    float: left;
 }
-.userContainer .btn-group button{
+
+.userContainer .btn-group button {
     /*width:50px;*/
 }
-.editInput{
+
+.editInput {
     max-width: 150px;
 }
