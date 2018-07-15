@@ -1,108 +1,48 @@
 var cl = console.log;
 cl('online');
-var storedUsers = localStorage.getItem("storedUsers") != null ? JSON.parse(localStorage.getItem("storedUsers")) : [];
-
-$.ajax({
-        url: 'https://randomuser.me/api/?results=10',
-        dataType: 'json',
-    })
-    .then((user) => {
-        user.results.forEach(element => {
-            storedUsers.push(element);
-            return storedUsers;
-        })
-
-    }).then(() => {
-        storedUsers.forEach(element => {
-            userMaker(element);
-        })
-        cl(storedUsers.length);
-        localStorage.setItem("storedUsers", JSON.stringify(storedUsers));
-    });
 
 $('#userspawner').click(function(e) {
     e.preventDefault();
-    $.ajax({
-            url: 'https://randomuser.me/api/',
-            dataType: 'json',
-        })
-        .then((user) => {
-            userMaker(user.results[0]);
-        })
+    makeUser(1);
 });
 
-function userMaker(user) {
-    if ($('#nousersMsg').length) $('#nousersMsg').remove();
-    var container = $('<div>', {
-        class: 'userContainer',
-        id: user.login.uuid,
-    });
-
-    var userImg = $('<img>', {
-        src: user.picture.large,
-        alt: user.name.last
-    })
-    var pGender = $('<p>', {
-        html: 'gender: ' + "<span>" + user.gender + "</span>"
-    })
-    var pName = $('<p>', {
-        html: 'name: ' + "<span>" + user.name.title + " " + user.name.last + "</span>"
-    })
-    var pAge = $('<p>', {
-        html: 'bolking age: ' + "<span>" + user.dob.age + "</span>"
-    })
-    var pEmail = $('<p>', {
-        html: 'email: ' + "<span>" + user.email + "</span>"
-    })
-    var btnGroup = $("<div>", {
-        class: "btn-group align",
-        role: "group"
-    })
-    var btnDel = $('<button>', {
-        id: user.login.uuid,
-        class: "btn btn-danger",
-        text: "delete",
-        click: () => {
-            cl('clcikeddelF!')
-            $('#' + user.login.uuid).remove()
-        }
-    })
-    var btnEdit = $('<button>', {
-        id: user.login.uuid,
-        class: "btn btn-warning",
-        text: "edit",
-        click: () => {
-            cl('clcikedEdit!');
-            $($('#' + user.login.uuid + ' span')).each(function(index, element) {
-                var content = $(element).text();
-                var input = $('<input>', {
-                    value: content,
-                    class: "editInput"
-                })
-                cl($(element));
-                $(element).replaceWith(input);
+function makeUser(int) {
+    $.get("user.html", (html) => {
+        $.get('https://randomuser.me/api/?results=' + int, (user) => {
+            var userInstance = user.results[0];
+            var htmlReplaceValuesObj = {
+                userID: userInstance.login.uuid,
+                userImage: userInstance.picture.large,
+                userGender: userInstance.gender,
+                userName: userInstance.name.title.capitalize() + " " + userInstance.name.last.capitalize() + "," + userInstance.name.first.capitalize(),
+                userAge: userInstance.dob.age,
+                userEmail: userInstance.email,
+            }
+            var outputHtml = html;
+            $.each(htmlReplaceValuesObj, (key, value) => {
+                var regEx = new RegExp('{{' + key + '}}', 'gi');
+                outputHtml = outputHtml.replace(regEx, value);
             });
-            $('#' + user.login.uuid + " .btn-group").append(
-                $('<button>', {
-                    text: "save",
-                    class: "btn btn-success",
-                    click: (e) => {
-                        cl('clickedsuccess!');
-                        $('#' + user.login.uuid + ' input').each(function(index, element) {
-                            cl(element, index);
-                            var content = $(element).val();
-                            var spanEdited = $('<span>', {
-                                text: content,
-                            })
-                            $(element).replaceWith(spanEdited);
-                        });
-                        e.target.remove();
-                    }
-                })
-            )
-        }
+            $(outputHtml + '> .btn btn-danger').click(() => {
+                cl('clicked del!')
+                $('#' + userInstance.login.uuid).remove()
+            });
+            //grab buttons from this instance user.html for assignemnt usage
+            $(outputHtml).appendTo($('#userList'));
+            //build btn functionality
+            // cl($(outputHtml).find('.btn-danger'));
+            $('.btn-danger').click((e) => {
+                cl($(e.target).closest('.userContainer'));
+            });
+
+            $('.btn-edit').click((e) => {
+                cl($(e.target).closest('.userContainer'));
+            });
+        })
     });
-    btnGroup.append([btnDel, btnEdit])
-    container.append([userImg, pGender, pName, pAge, pEmail, btnGroup]);
-    $('#userList').append(container);
+}
+
+//capitalize 
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
 }
