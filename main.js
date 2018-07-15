@@ -87,29 +87,7 @@ function makeUser(int) {
     });
 }
 
-//capitalize 
+//capitalize first letter of a string
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
 }
-
-
-
-
-// $('#' + user.login.uuid + " .btn-group").append(
-//     $('<button>', {
-//         text: "save",
-//         class: "btn btn-success",
-//         click: (e) => {
-//             cl('clickedsuccess!');
-//             $('#' + user.login.uuid + ' input').each(function(index, element) {
-//                 cl(element, index);
-//                 var content = $(element).val();
-//                 var spanEdited = $('<span>', {
-//                     text: content,
-//                 })
-//                 $(element).replaceWith(spanEdited);
-//             });
-//             e.target.remove();
-//         }
-//     })
-// )
