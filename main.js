@@ -16,10 +16,8 @@ function someCl(html) {
         url: 'https://randomuser.me/api/',
         dataType: 'json',
     }).then((user) => {
-        cl('durr', user.results[0].name.first);
         var userDOMList = $('.userContainer');
         var userDOMListRandomElement = userDOMList[Math.floor(Math.random() * userDOMList.length)];
-        cl(userDOMListRandomElement.id);
         $(userDOMListRandomElement).fadeOut('slow').promise().done(() => {
             $(userDOMListRandomElement).replaceWith(buildUser(user.results[0], html));
             $(userDOMListRandomElement).fadeIn('slow');
@@ -81,43 +79,49 @@ $.ajax({
 
             //edit contact
             $('.btn-edit').click((e) => {
+                thisBtn = $(e.target);
                 //grab the contact parent of this clicked button 
                 var container = $(e.target).closest('.userContainer');
+
                 //define the spans with info to edit
                 spanList = container.find('span');
-                //convert all span to input
-                spanList.each(function(index, element) {
-                    //store span content
-                    var content = $(element).text();
-                    var input = $('<input>', {
-                        value: content,
-                        class: "editInput"
-                    });
-                    //replace span with input for edit
-                    $(element).replaceWith(input);
-                });
-                //make save button
-                //find btn group of edit button and append a save button
-                var btnGroup = $(e.target).closest('.btn-group');
-                btnGroup.append(
-                    $('<button>', {
-                        text: "save",
-                        class: "btn btn-success",
-                        click: (e) => {
-                            //cl('clickedsuccess!');
-                            spanList = container.find('input');
-                            spanList.each(function(index, element) {
-                                //cl(element, index);
-                                var content = $(element).val();
-                                var spanEdited = $('<span>', {
-                                    text: content,
-                                })
-                                $(element).replaceWith(spanEdited);
+
+                //define button behaviour
+                switch ($(e.target).attr('class')) {
+                    case 'btn btn-edit':
+                        thisBtn.text('Save'),
+                            thisBtn.removeClass('btn-edit'),
+                            thisBtn.addClass('btn-success');
+
+                        //convert all span to input
+                        spanList.each(function(index, element) {
+                            //store span content
+                            var content = $(element).text();
+                            var input = $('<input>', {
+                                value: content,
+                                class: "editInput"
                             });
-                            e.target.remove();
-                        }
-                    })
-                );
+                            //replace span with input for edit
+                            $(element).replaceWith(input);
+                        });
+                        break;
+                    case 'btn btn-success':
+                        thisBtn.text('Edit'),
+                            thisBtn.removeClass('btn-success'),
+                            thisBtn.addClass('btn-edit');
+
+                        //replace input with span on save
+                        spanList = container.find('input');
+                        spanList.each(function(index, element) {
+                            //cl(element, index);
+                            var content = $(element).val();
+                            var spanEdited = $('<span>', {
+                                text: content,
+                            })
+                            $(element).replaceWith(spanEdited);
+                        });
+                        break;
+                }
             });
         });
     });

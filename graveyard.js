@@ -76,3 +76,28 @@ function btnGroupCreate(userID) {
     btnGroup.append([btnDel, btnEdit])
     container.append([userImg, pGender, pName, pAge, pEmail, btnGroup]);
 }
+
+
+
+//make save button
+//find btn group of edit button and append a save button
+var btnGroup = $(e.target).closest('.btn-group');
+btnGroup.append(
+    $('<button>', {
+        text: "save",
+        class: "btn btn-success",
+        click: (e) => {
+            //cl('clickedsuccess!');
+            spanList = container.find('input');
+            spanList.each(function(index, element) {
+                //cl(element, index);
+                var content = $(element).val();
+                var spanEdited = $('<span>', {
+                    text: content,
+                })
+                $(element).replaceWith(spanEdited);
+            });
+            e.target.remove();
+        }
+    })
+);
